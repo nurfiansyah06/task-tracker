@@ -11,7 +11,7 @@ Requires Go 1.22 or later:
 go run .
 ```
 
-The server listens at `http://127.0.0.1:8080`. Tasks persist in `task.json`
+The server listens on all interfaces at port `3000` (locally, `http://localhost:3000`). Tasks persist in `task.json`
 in the working directory. A missing file starts an empty task list.
 This local API has no authentication.
 
@@ -23,7 +23,7 @@ Returns `200 OK` with an array of tasks, or `[]` when empty.
 Each task has `id`, `name`, and `status`.
 
 ```sh
-curl http://127.0.0.1:8080/tasks
+curl http://localhost:3000/tasks
 ```
 
 ### POST /tasks
@@ -34,7 +34,7 @@ using the highest existing ID plus one. Unknown fields are rejected.
 Returns `201 Created` with the saved task.
 
 ```sh
-curl -X POST http://127.0.0.1:8080/tasks \
+curl -X POST http://localhost:3000/tasks \
   -H 'Content-Type: application/json' \
   -d '{"name":"Buy groceries","status":"Progress"}'
 ```
@@ -49,7 +49,7 @@ Replaces a task's name and status, preserving its ID. Both fields are required;
 send only `name` and `status`, not `id`. Returns `200` with the updated task.
 
 ```sh
-curl -X PUT http://127.0.0.1:8080/tasks/8 \
+curl -X PUT http://localhost:3000/tasks/8 \
   -H 'Content-Type: application/json' \
   -d '{"name":"Buy Car","status":"Done"}'
 ```
@@ -59,9 +59,19 @@ curl -X PUT http://127.0.0.1:8080/tasks/8 \
 Deletes a task and returns `204 No Content` with no response body.
 
 ```sh
-curl -X DELETE http://127.0.0.1:8080/tasks/8
+curl -X DELETE http://localhost:3000/tasks/8
 ```
 
 Both item endpoints return `404` if the task does not exist, `400` for invalid
 IDs or input, and `500` for storage failures. Unsupported item methods return
 `405` with `Allow: PUT, DELETE`.
+
+## Deployment health check
+
+Configure the ECS container and target group to use port `3000`, with
+health-check path `/health` and expected status `200`.
+`GET /health` returns `{"status":"ok"}` without accessing task storage.
+It checks that the HTTP server responds, not that storage is writable.
+
+Container-local `task.json` is ephemeral and is not shared across replicas.
+Use durable shared storage before relying on this API for persistent deployed data.

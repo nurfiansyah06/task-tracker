@@ -9,6 +9,15 @@ import (
 	"testing"
 )
 
+func TestHealth(t *testing.T) {
+	handler := newTaskHandler(filepath.Join(t.TempDir(), "task.json"))
+	res := httptest.NewRecorder()
+	handler.ServeHTTP(res, httptest.NewRequest("GET", "/health", nil))
+	if res.Code != 200 || res.Body.String() != "{\"status\":\"ok\"}\n" {
+		t.Fatalf("unexpected health response: %d %s", res.Code, res.Body)
+	}
+}
+
 func TestTasksAPI(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "task.json")
 	handler := newTaskHandler(path)
