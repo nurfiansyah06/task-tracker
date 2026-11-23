@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
 )
 
 type Task struct {
@@ -138,23 +141,11 @@ func AddTask(task Task) string {
 }
 
 func main() {
-
-	fmt.Println(DeleteTask(5))
-
-	task := Task{
-		Id:     7,
-		Name:   "Buy Gundam",
-		Status: "Progress",
+	server := &http.Server{
+		Addr:              "127.0.0.1:8080",
+		Handler:           newTaskHandler("task.json"),
+		ReadHeaderTimeout: 5 * time.Second,
 	}
-
-	fmt.Println(AddTask(task))
-
-	// Read the tasks
-	fmt.Println(ReadTask())
-
-	// Read the tasks in Done
-	fmt.Println(ReadTaskDone())
-
-	// Read the tasks in Progress
-	fmt.Println(ReadTaskProgress())
+	log.Printf("Task API listening on http://%s", server.Addr)
+	log.Fatal(server.ListenAndServe())
 }
