@@ -142,7 +142,7 @@ func AddTask(task Task) string {
 
 func main() {
 	server := &http.Server{
-		Addr:              ":3000",
+		Addr:              ":8080",
 		Handler:           newTaskHandler("task.json"),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
