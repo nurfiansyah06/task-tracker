@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -141,8 +142,13 @@ func AddTask(task Task) string {
 }
 
 func main() {
+	port := os.Getenv("DEFAULT_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	server := &http.Server{
-		Addr:              ":8080",
+		Addr:              ":" + port,
 		Handler:           newTaskHandler("task.json"),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
