@@ -22,3 +22,5 @@ jobs:
         run: go test ./.
       - name: Build
         run: go build -o main
+      - name: Build Successful
+        run: echo "Build Successful!"
