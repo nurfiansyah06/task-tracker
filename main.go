@@ -149,7 +149,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:              ":" + port,
-		Handler:           newTaskHandler("task.json"),
+		Handler:           withLogging(newTaskHandler("task.json")),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	log.Printf("Task API listening on http://%s", server.Addr)
